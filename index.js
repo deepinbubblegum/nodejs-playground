@@ -3,6 +3,8 @@ const pool = require('./db');
 const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
+const multer  = require('multer');
+// const fs = require('fs');
 const port = 8000;
 
 app.use(express.static('images'));
@@ -10,6 +12,36 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+let upload = multer({ dest: 'images/' });
+app.post('/Movies', upload.single('file'), async (req, res, next) => {
+    // let conn;
+    try {
+        console.log(req.file);
+        console.log(req.body.ID);
+
+        // conn = await pool.getConnection();
+        // var query = `INSERT INTO Movies (ID, Name, URL, Description, Picture) VALUES ('${req.body.ID}', '${req.body.Name}', '${req.body.URL}', '${req.body.Description}', '${req.body.Picture}')`;
+        // console.log(query);
+        // await conn.query(query);
+        res.status(201).send();
+    } catch (err) {
+        throw err;
+    }
+});
+
+app.put('/Movies', async (req, res) => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        var query = `UPDATE Movies SET Name = '${req.body.Name}', URL = '${req.body.URL}', Description = '${req.body.Description}', Picture = '${req.body.Picture}' WHERE Id = ${req.body.ID}`;
+        console.log(query);
+        await conn.query(query);
+        res.status(200).send();
+    } catch (err) {
+        throw err;
+    }
+});
 
 app.get('/movies', async (req, res) => {
     let conn;
